@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2506 - 극한과 다항함수 변형문제</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 5px;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .quiz-card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .difficulty {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+        }
+
+        .difficulty.easy { background: #2ecc71; }
+        .difficulty.medium { background: #f39c12; }
+        .difficulty.hard { background: #e74c3c; }
+
+        .question {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .question .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            color: #00ff88;
+        }
+
+        .hint-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .hint-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hint-box h4 {
+            color: #ffc107;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .hint-box p {
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .answer-input:focus {
+            border-color: #00d4ff;
+        }
+
+        .answer-input::placeholder {
+            color: #666;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-box.correct {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+        }
+
+        .result-box.incorrect {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+        }
+
+        .solution-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .solution-box.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .solution-box h4 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .solution-box p, .solution-box li {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+
+        .solution-box ol {
+            margin-left: 20px;
+        }
+
+        .final-score {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .final-score.active {
+            display: block;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
+        .score-message {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* Fraction styling */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+
+        .fraction .num, .fraction .den {
+            padding: 2px 5px;
+        }
+
+        .fraction .num {
+            border-bottom: 1px solid #00ff88;
+        }
+
+        .lim {
+            font-size: 0.9em;
+        }
+
+        .lim sub {
+            font-size: 0.7em;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .question { font-size: 1rem; padding: 15px; }
+            .btn { padding: 10px 20px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>극한과 다항함수</h1>
+            <p class="subtitle">10단계 변형문제 퀴즈</p>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="progress-text" id="progressText">문제 1 / 10</p>
+
+        <!-- Step 1 -->
+        <div class="quiz-card active" data-step="1">
+            <span class="step-badge">STEP 1</span>
+            <span class="difficulty easy">기초</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) - 3</span>
+                    <span class="den math">x - 2</span>
+                </span> = 4 일 때, <span class="math">f(2)</span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint1">
+                <h4>힌트</h4>
+                <p>극한값이 존재하고 분모가 0이 되므로, 분자도 0이 되어야 합니다.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer1" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(1)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(1)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result1"></div>
+            <div class="solution-box" id="solution1">
+                <h4>풀이</h4>
+                <ol>
+                    <li>극한값 4가 존재하고, 분모 x-2 → 0 (x→2)</li>
+                    <li>극한이 존재하려면 분자도 0이 되어야 함</li>
+                    <li>따라서 f(2) - 3 = 0</li>
+                    <li><strong>f(2) = 3</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="quiz-card" data-step="2">
+            <span class="step-badge">STEP 2</span>
+            <span class="difficulty easy">기초</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→1</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 2</span>
+                    <span class="den math">x - 1</span>
+                </span> = 5 일 때, <span class="math">f(1)</span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint2">
+                <h4>힌트</h4>
+                <p>분모가 0이 될 때 극한이 존재하려면 분자도 0이 되어야 합니다.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer2" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(2)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(2)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result2"></div>
+            <div class="solution-box" id="solution2">
+                <h4>풀이</h4>
+                <ol>
+                    <li>극한값 5가 존재하고, 분모 x-1 → 0 (x→1)</li>
+                    <li>극한이 존재하려면 분자 f(1) + 2 = 0</li>
+                    <li><strong>f(1) = -2</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="quiz-card" data-step="3">
+            <span class="step-badge">STEP 3</span>
+            <span class="difficulty easy">기초</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여 <span class="math">f(3) = -5</span>일 때,
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x - 3</span>
+                </span>가 존재함을 설명하고, 이 극한값을 <span class="math">f'(3)</span>으로 나타내시오.
+                <br><br>
+                (답: f'(3)의 계수를 입력. 예: 1이면 1 입력)
+            </div>
+            <div class="hint-box" id="hint3">
+                <h4>힌트</h4>
+                <p>f(3) = -5이므로 f(x) + 5 = f(x) - f(3)입니다. 미분계수의 정의를 생각해보세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer3" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(3)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(3)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result3"></div>
+            <div class="solution-box" id="solution3">
+                <h4>풀이</h4>
+                <ol>
+                    <li>f(3) = -5이므로 f(x) + 5 = f(x) - (-5) = f(x) - f(3)</li>
+                    <li>lim<sub>x→3</sub> (f(x) + 5)/(x - 3) = lim<sub>x→3</sub> (f(x) - f(3))/(x - 3)</li>
+                    <li>이것은 미분계수의 정의!</li>
+                    <li><strong>= f'(3)</strong> (계수는 1)</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="quiz-card" data-step="4">
+            <span class="step-badge">STEP 4</span>
+            <span class="difficulty medium">중급</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x - 3</span>
+                </span> = 3 일 때,
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x<sup>2</sup> - 9</span>
+                </span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint4">
+                <h4>힌트</h4>
+                <p>x² - 9 = (x+3)(x-3)으로 인수분해하세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer4" placeholder="답을 입력하세요 (분수는 a/b 형태로)">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(4)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(4)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result4"></div>
+            <div class="solution-box" id="solution4">
+                <h4>풀이</h4>
+                <ol>
+                    <li>x² - 9 = (x + 3)(x - 3)</li>
+                    <li>lim<sub>x→3</sub> (f(x) + 5)/(x² - 9) = lim<sub>x→3</sub> (f(x) + 5)/[(x+3)(x-3)]</li>
+                    <li>= lim<sub>x→3</sub> [(f(x) + 5)/(x-3)] × [1/(x+3)]</li>
+                    <li>= 3 × (1/6) = <strong>1/2</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="quiz-card" data-step="5">
+            <span class="step-badge">STEP 5</span>
+            <span class="difficulty medium">중급</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x - 3</span>
+                </span> = 3 일 때,
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">{f(x)}<sup>2</sup> + 5f(x)</span>
+                    <span class="den math">x - 3</span>
+                </span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint5">
+                <h4>힌트</h4>
+                <p>분자를 인수분해하면 f(x){f(x) + 5}입니다. f(3)의 값을 먼저 구하세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer5" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(5)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(5)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result5"></div>
+            <div class="solution-box" id="solution5">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(3) = -5</li>
+                    <li>분자: {f(x)}² + 5f(x) = f(x){f(x) + 5}</li>
+                    <li>lim<sub>x→3</sub> f(x){f(x) + 5}/(x - 3)</li>
+                    <li>= lim<sub>x→3</sub> f(x) × lim<sub>x→3</sub> (f(x) + 5)/(x - 3)</li>
+                    <li>= f(3) × 3 = (-5) × 3 = <strong>-15</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="quiz-card" data-step="6">
+            <span class="step-badge">STEP 6</span>
+            <span class="difficulty medium">중급</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x - 3</span>
+                </span> = 3 일 때,
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">x<sup>2</sup>f(x) - 9f(x)</span>
+                    <span class="den math">x - 3</span>
+                </span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint6">
+                <h4>힌트</h4>
+                <p>분자를 인수분해하면 f(x)(x² - 9) = f(x)(x+3)(x-3)입니다.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer6" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(6)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(6)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result6"></div>
+            <div class="solution-box" id="solution6">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(3) = -5</li>
+                    <li>분자: x²f(x) - 9f(x) = f(x)(x² - 9) = f(x)(x+3)(x-3)</li>
+                    <li>lim<sub>x→3</sub> f(x)(x+3)(x-3)/(x-3)</li>
+                    <li>= lim<sub>x→3</sub> f(x)(x+3)</li>
+                    <li>= f(3) × 6 = (-5) × 6 = <strong>-30</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 7 (Original Problem) -->
+        <div class="quiz-card" data-step="7">
+            <span class="step-badge">STEP 7</span>
+            <span class="difficulty hard">원본문제</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 5</span>
+                    <span class="den math">x - 3</span>
+                </span> = 3 일 때,
+                <span class="math">lim<sub>x→3</sub></span>
+                <span class="fraction">
+                    <span class="num math">{f(x)}<sup>2</sup> + 5f(x)</span>
+                    <span class="den math">x<sup>2</sup>f(x) - 9f(x)</span>
+                </span>의 값을 구하시오.
+                <br><small>(단, f(x) ≠ 0)</small>
+            </div>
+            <div class="hint-box" id="hint7">
+                <h4>힌트</h4>
+                <p>분자 = f(x){f(x)+5}, 분모 = f(x)(x+3)(x-3). 약분 후 계산하세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer7" placeholder="답을 입력하세요 (분수는 a/b 형태로)">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(7)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(7)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result7"></div>
+            <div class="solution-box" id="solution7">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(3) = -5</li>
+                    <li>분자: {f(x)}² + 5f(x) = f(x){f(x) + 5}</li>
+                    <li>분모: x²f(x) - 9f(x) = f(x)(x² - 9) = f(x)(x+3)(x-3)</li>
+                    <li>= lim<sub>x→3</sub> f(x){f(x) + 5} / [f(x)(x+3)(x-3)]</li>
+                    <li>= lim<sub>x→3</sub> {f(x) + 5} / [(x+3)(x-3)]</li>
+                    <li>= lim<sub>x→3</sub> [(f(x)+5)/(x-3)] × [1/(x+3)]</li>
+                    <li>= 3 × (1/6) = <strong>1/2</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 8 -->
+        <div class="quiz-card" data-step="8">
+            <span class="step-badge">STEP 8</span>
+            <span class="difficulty hard">심화</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) - 4</span>
+                    <span class="den math">x - 2</span>
+                </span> = 5 일 때,
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">{f(x)}<sup>2</sup> - 4f(x)</span>
+                    <span class="den math">x<sup>2</sup>f(x) - 4f(x)</span>
+                </span>의 값을 구하시오.
+                <br><small>(단, f(x) ≠ 0)</small>
+            </div>
+            <div class="hint-box" id="hint8">
+                <h4>힌트</h4>
+                <p>원본문제와 같은 유형입니다. f(2)를 구하고, 분자·분모를 인수분해하세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer8" placeholder="답을 입력하세요 (분수는 a/b 형태로)">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(8)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(8)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result8"></div>
+            <div class="solution-box" id="solution8">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(2) = 4</li>
+                    <li>분자: {f(x)}² - 4f(x) = f(x){f(x) - 4}</li>
+                    <li>분모: x²f(x) - 4f(x) = f(x)(x² - 4) = f(x)(x+2)(x-2)</li>
+                    <li>= lim<sub>x→2</sub> {f(x) - 4} / [(x+2)(x-2)]</li>
+                    <li>= lim<sub>x→2</sub> [(f(x)-4)/(x-2)] × [1/(x+2)]</li>
+                    <li>= 5 × (1/4) = <strong>5/4</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 9 -->
+        <div class="quiz-card" data-step="9">
+            <span class="step-badge">STEP 9</span>
+            <span class="difficulty hard">심화</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→1</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 3</span>
+                    <span class="den math">x - 1</span>
+                </span> = 2 일 때,
+                <span class="math">lim<sub>x→1</sub></span>
+                <span class="fraction">
+                    <span class="num math">{f(x)}<sup>2</sup> + 6f(x) + 9</span>
+                    <span class="den math">(x - 1)<sup>2</sup></span>
+                </span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint9">
+                <h4>힌트</h4>
+                <p>분자 = {f(x) + 3}²입니다. 제곱의 형태로 정리하세요.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer9" placeholder="답을 입력하세요">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(9)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(9)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result9"></div>
+            <div class="solution-box" id="solution9">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(1) = -3</li>
+                    <li>분자: {f(x)}² + 6f(x) + 9 = {f(x) + 3}²</li>
+                    <li>lim<sub>x→1</sub> {f(x) + 3}² / (x - 1)²</li>
+                    <li>= [lim<sub>x→1</sub> (f(x) + 3)/(x - 1)]²</li>
+                    <li>= 2² = <strong>4</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 10 -->
+        <div class="quiz-card" data-step="10">
+            <span class="step-badge">STEP 10</span>
+            <span class="difficulty hard">최고난도</span>
+            <div class="question">
+                다항함수 <span class="math">f(x)</span>에 대하여
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x) + 1</span>
+                    <span class="den math">x - 2</span>
+                </span> = 3,
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">g(x) - 2</span>
+                    <span class="den math">x - 2</span>
+                </span> = 4 일 때,
+                <span class="math">lim<sub>x→2</sub></span>
+                <span class="fraction">
+                    <span class="num math">f(x)g(x) + g(x)</span>
+                    <span class="den math">x<sup>2</sup> - 4</span>
+                </span>의 값을 구하시오.
+            </div>
+            <div class="hint-box" id="hint10">
+                <h4>힌트</h4>
+                <p>f(2) = -1, g(2) = 2를 먼저 구합니다. 분자 = g(x){f(x) + 1}로 인수분해됩니다.</p>
+            </div>
+            <div class="answer-section">
+                <input type="text" class="answer-input" id="answer10" placeholder="답을 입력하세요 (분수는 a/b 형태로)">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="toggleHint(10)">힌트 보기</button>
+                    <button class="btn btn-primary" onclick="checkAnswer(10)">제출</button>
+                </div>
+            </div>
+            <div class="result-box" id="result10"></div>
+            <div class="solution-box" id="solution10">
+                <h4>풀이</h4>
+                <ol>
+                    <li>조건에서 f(2) = -1, g(2) = 2</li>
+                    <li>분자: f(x)g(x) + g(x) = g(x){f(x) + 1}</li>
+                    <li>분모: x² - 4 = (x+2)(x-2)</li>
+                    <li>= lim<sub>x→2</sub> g(x){f(x) + 1} / [(x+2)(x-2)]</li>
+                    <li>= lim<sub>x→2</sub> g(x) × [(f(x)+1)/(x-2)] × [1/(x+2)]</li>
+                    <li>= g(2) × 3 × (1/4) = 2 × 3 × (1/4)</li>
+                    <li>= <strong>3/2</strong></li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Final Score -->
+        <div class="quiz-card final-score" id="finalScore">
+            <div class="score-circle" id="scoreValue">0/10</div>
+            <p class="score-message" id="scoreMessage">수고하셨습니다!</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">정답</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="incorrectCount">0</div>
+                    <div class="stat-label">오답</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="hintCount">0</div>
+                    <div class="stat-label">힌트 사용</div>
+                </div>
+            </div>
+            <div class="btn-group" style="justify-content: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="resetQuiz()">다시 풀기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const answers = {
+            1: ['3'],
+            2: ['-2'],
+            3: ['1'],
+            4: ['1/2', '0.5'],
+            5: ['-15'],
+            6: ['-30'],
+            7: ['1/2', '0.5'],
+            8: ['5/4', '1.25'],
+            9: ['4'],
+            10: ['3/2', '1.5']
+        };
+
+        let currentStep = 1;
+        let score = 0;
+        let hintsUsed = 0;
+        let wrongAnswers = 0;
+        const totalSteps = 10;
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `문제 ${currentStep} / ${totalSteps}`;
+        }
+
+        function toggleHint(step) {
+            const hintBox = document.getElementById('hint' + step);
+            if (!hintBox.classList.contains('show')) {
+                hintsUsed++;
+            }
+            hintBox.classList.toggle('show');
+        }
+
+        function checkAnswer(step) {
+            const userAnswer = document.getElementById('answer' + step).value.trim();
+            const resultBox = document.getElementById('result' + step);
+            const solutionBox = document.getElementById('solution' + step);
+            const correctAnswers = answers[step];
+
+            const isCorrect = correctAnswers.some(ans => userAnswer === ans);
+
+            resultBox.classList.add('show');
+            solutionBox.classList.add('show');
+
+            if (isCorrect) {
+                resultBox.className = 'result-box show correct';
+                resultBox.innerHTML = '<strong>정답입니다!</strong> 훌륭해요!';
+                score++;
+            } else {
+                resultBox.className = 'result-box show incorrect';
+                resultBox.innerHTML = `<strong>오답입니다.</strong> 정답: ${correctAnswers[0]}`;
+                wrongAnswers++;
+            }
+
+            // Disable input and button
+            document.getElementById('answer' + step).disabled = true;
+            event.target.disabled = true;
+
+            // Show next button
+            const btnGroup = event.target.parentElement;
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn btn-primary';
+            nextBtn.textContent = step < totalSteps ? '다음 문제' : '결과 보기';
+            nextBtn.onclick = () => goToNext(step);
+            btnGroup.appendChild(nextBtn);
+        }
+
+        function goToNext(currentStepNum) {
+            document.querySelector(`.quiz-card[data-step="${currentStepNum}"]`).classList.remove('active');
+
+            if (currentStepNum < totalSteps) {
+                currentStep = currentStepNum + 1;
+                document.querySelector(`.quiz-card[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('progressText').textContent = '완료!';
+
+            const finalScoreCard = document.getElementById('finalScore');
+            finalScoreCard.classList.add('active');
+
+            document.getElementById('scoreValue').textContent = `${score}/${totalSteps}`;
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = wrongAnswers;
+            document.getElementById('hintCount').textContent = hintsUsed;
+
+            let message = '';
+            if (score === totalSteps) {
+                message = '완벽합니다! 극한의 달인이시네요!';
+            } else if (score >= 8) {
+                message = '훌륭합니다! 거의 다 맞추셨네요!';
+            } else if (score >= 6) {
+                message = '좋습니다! 조금 더 연습하면 완벽해질 거예요!';
+            } else if (score >= 4) {
+                message = '괜찮아요! 풀이를 복습하고 다시 도전해보세요!';
+            } else {
+                message = '기초부터 차근차근 복습해보세요!';
+            }
+            document.getElementById('scoreMessage').textContent = message;
+        }
+
+        function resetQuiz() {
+            currentStep = 1;
+            score = 0;
+            hintsUsed = 0;
+            wrongAnswers = 0;
+
+            // Reset all cards
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector('.quiz-card[data-step="1"]').classList.add('active');
+            document.getElementById('finalScore').classList.remove('active');
+
+            // Reset all inputs and results
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById('answer' + i).value = '';
+                document.getElementById('answer' + i).disabled = false;
+                document.getElementById('result' + i).classList.remove('show', 'correct', 'incorrect');
+                document.getElementById('solution' + i).classList.remove('show');
+                document.getElementById('hint' + i).classList.remove('show');
+
+                // Remove added next buttons
+                const btnGroup = document.querySelector(`.quiz-card[data-step="${i}"] .btn-group`);
+                const buttons = btnGroup.querySelectorAll('.btn-primary');
+                buttons.forEach((btn, index) => {
+                    if (index > 0) btn.remove();
+                    else btn.disabled = false;
+                });
+            }
+
+            updateProgress();
+        }
+
+        // Initialize
+        updateProgress();
+
+        // Enter key to submit
+        document.querySelectorAll('.answer-input').forEach((input, index) => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !input.disabled) {
+                    checkAnswer(index + 1);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
